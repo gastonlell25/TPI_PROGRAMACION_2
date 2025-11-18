@@ -1,0 +1,119 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>TPI_PROGRAMACION_2 - Diagrama de clases general
+Autores: Gaston Lell, Adriel Lopez, Juan Cruz Leal, Gabriel Lovera</help_text><element><id>UMLClass</id><coordinates><x>0</x><y>70</y><w>210</w><h>170</h></coordinates><panel_attributes>BaseEntity
+--
+- id: Long
+- deleted: boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>220</x><y>30</y><w>210</w><h>170</h></coordinates><panel_attributes>Employee
+--
+- firstName: String
+- lastName: String
+- legalId: String
+- email: String
+- hireDate: LocalDate
+- area: String
+- employeeFile: EmployeeFile
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>610</x><y>30</y><w>210</w><h>170</h></coordinates><panel_attributes>EmployeeFile
+--
+- fileNumber: String
+- category: String
+- status: FileStatus
+- dateCreated: LocalDate
+- observation: String
+- employeeId: Long</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>950</x><y>50</y><w>210</w><h>170</h></coordinates><panel_attributes>&lt;&lt;enumeration&gt;&gt;
+FileStatus
+--
+ACTIVO
+INACTIVO</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>80</x><y>270</y><w>210</w><h>170</h></coordinates><panel_attributes>&lt;&lt;interface&gt;&gt;
+GenericDAO&lt;T&gt;
+--
++ insert(entity: T, conn: Connection)
++ update(entity: T, conn: Connection)
++ getById(id: Long, conn: Connection): T
++ getAll(conn: Connection): List&lt;T&gt;
++ delete(id: Long, conn: Connection)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>340</x><y>270</y><w>210</w><h>170</h></coordinates><panel_attributes>EmployeeDAO
+--
+- TABLE_NAME: String
+--
++ insert(employee: Employee, conn: Connection)
++ update(employee: Employee, conn: Connection)
++ getById(id: Long, conn: Connection): Employee
++ getAll(conn: Connection): List&lt;Employee&gt;
++ delete(id: Long, conn: Connection)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>600</x><y>270</y><w>210</w><h>170</h></coordinates><panel_attributes>EmployeeFileDAO
+--
+- TABLE_NAME: String
+--
++ insert(employeeFile: EmployeeFile, conn: Connection)
++ update(employeeFile: EmployeeFile, conn: Connection)
++ getById(id: Long, conn: Connection): EmployeeFile
++ getAll(conn: Connection): List&lt;EmployeeFile&gt;
++ delete(id: Long, conn: Connection)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>80</x><y>480</y><w>210</w><h>170</h></coordinates><panel_attributes>&lt;&lt;interface&gt;&gt;
+GenericService&lt;T&gt;
+--
++ insert(entity: T)
++ update(entity: T)
++ delete(id: Long)
++ getById(id: Long): T
++ getAll(): List&lt;T&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>340</x><y>480</y><w>210</w><h>170</h></coordinates><panel_attributes>EmployeeServiceImpl
+--
+- employeeDAO: EmployeeDAO
+--
++ insert(employee: Employee)
++ update(employee: Employee)
++ delete(id: Long)
++ getById(id: Long): Employee
++ getAll(): List&lt;Employee&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>600</x><y>480</y><w>210</w><h>170</h></coordinates><panel_attributes>EmployeeFileServiceImpl
+--
+- employeeFileDAO: EmployeeFileDAO
+--
++ insert(employeeFile: EmployeeFile)
++ update(employeeFile: EmployeeFile)
++ delete(id: Long)
++ getById(id: Long): EmployeeFile
++ getAll(): List&lt;EmployeeFile&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>80</x><y>690</y><w>210</w><h>170</h></coordinates><panel_attributes>DatabaseConnection
+--
++ getConnection(): Connection</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>340</x><y>690</y><w>210</w><h>170</h></coordinates><panel_attributes>TransactionManager
+--
+- connection: Connection
+- autoCommitOriginal: boolean
+--
++ startTransaction()
++ commit()
++ rollback()
++ close()
++ getConnection(): Connection</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>600</x><y>690</y><w>210</w><h>170</h></coordinates><panel_attributes>ValidationHelper
+--
+{static} + isNotEmpty(value: String): boolean
+{static} + hasLength(value: String, min: int, max: int): boolean
+{static} + isValidEmail(email: String): boolean</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>80</x><y>900</y><w>210</w><h>170</h></coordinates><panel_attributes>Main
+--
++ main(args: String[]): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>340</x><y>900</y><w>210</w><h>170</h></coordinates><panel_attributes>AppMenu
+--
+- employeeService: EmployeeServiceImpl
+- employeeFileService: EmployeeFileServiceImpl
+--
++ run(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>600</x><y>900</y><w>210</w><h>170</h></coordinates><panel_attributes>MenuDisplay
+--
++ showMainMenu(): void
++ showEmployeeMenu(): void
++ showEmployeeFileMenu(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>860</x><y>900</y><w>210</w><h>170</h></coordinates><panel_attributes>MenuHandler
+--
++ handleMainMenu(): void
++ handleEmployeeMenu(): void
++ handleEmployeeFileMenu(): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>80</x><y>1110</y><w>210</w><h>170</h></coordinates><panel_attributes>TestConexion
+--
++ main(args: String[]): void</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>820</x><y>390</y><w>140</w><h>100</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;80;120;10</additional_attributes></element><element><id>Relation</id><coordinates><x>360</x><y>190</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;70;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>620</x><y>190</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;70;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>360</x><y>400</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;70;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>620</x><y>400</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;70;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>420</x><y>100</y><w>210</w><h>50</h></coordinates><panel_attributes>lt=-&gt;&gt;
+m1=
+m2=0..1
+employeeFile</panel_attributes><additional_attributes>10;20;190;20</additional_attributes></element><element><id>Relation</id><coordinates><x>810</x><y>110</y><w>160</w><h>40</h></coordinates><panel_attributes>lt=.&gt;
+status</panel_attributes><additional_attributes>10;20;140;20</additional_attributes></element><element><id>Relation</id><coordinates><x>400</x><y>470</y><w>50</w><h>80</h></coordinates><panel_attributes>lt=.&gt;
+uses</panel_attributes><additional_attributes>10;60;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>660</x><y>470</y><w>50</w><h>80</h></coordinates><panel_attributes>lt=.&gt;
+uses</panel_attributes><additional_attributes>10;60;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>410</x><y>560</y><w>140</w><h>60</h></coordinates><panel_attributes>lt=.&gt;
+transaction</panel_attributes><additional_attributes>10;10;120;40</additional_attributes></element><element><id>Relation</id><coordinates><x>410</x><y>600</y><w>140</w><h>60</h></coordinates><panel_attributes>lt=.&gt;
+transaction</panel_attributes><additional_attributes>10;10;120;40</additional_attributes></element><element><id>Relation</id><coordinates><x>120</x><y>710</y><w>180</w><h>40</h></coordinates><panel_attributes>lt=.&gt;
+getConnection</panel_attributes><additional_attributes>160;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>560</x><y>560</y><w>180</w><h>60</h></coordinates><panel_attributes>lt=.&gt;
+validate</panel_attributes><additional_attributes>10;40;160;10</additional_attributes></element><element><id>Relation</id><coordinates><x>560</x><y>600</y><w>180</w><h>60</h></coordinates><panel_attributes>lt=.&gt;
+validate</panel_attributes><additional_attributes>10;40;160;10</additional_attributes></element><element><id>Relation</id><coordinates><x>400</x><y>850</y><w>70</w><h>100</h></coordinates><panel_attributes>lt=.&gt;
+service</panel_attributes><additional_attributes>10;80;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>400</x><y>890</y><w>70</w><h>100</h></coordinates><panel_attributes>lt=.&gt;
+service</panel_attributes><additional_attributes>10;80;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>120</x><y>950</y><w>200</w><h>40</h></coordinates><panel_attributes>lt=.&gt;
+run()</panel_attributes><additional_attributes>10;20;180;20</additional_attributes></element><element><id>Relation</id><coordinates><x>70</x><y>1080</y><w>220</w><h>70</h></coordinates><panel_attributes>lt=.&gt;
+getConnection</panel_attributes><additional_attributes>10;50;200;10</additional_attributes></element></diagram>
