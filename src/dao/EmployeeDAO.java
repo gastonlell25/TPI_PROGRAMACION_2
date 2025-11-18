@@ -2,6 +2,7 @@ package dao;
 
 import Models.Employee;
 import Models.EmployeeFile;
+import Models.FileStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
@@ -105,42 +106,91 @@ public class EmployeeDAO implements GenericDAO<Employee> {
      * asociado (relación 1:1), o null si no se encuentra.
      * @throws SQLException Si ocurre un error de base de datos.
      */
-    @Override
-    public Employee getById(Long id, Connection conn) throws Exception {
-        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE id = ? AND deleted = FALSE";
+@Override
+public Employee getById(Long id, Connection conn) throws SQLException {
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setLong(1, id);
+    String sql = """
+        SELECT 
+            e.id AS e_id,
+            e.deleted AS e_deleted,
+            e.first_name,
+            e.last_name,
+            e.legal_id,
+            e.email,
+            e.hire_date,
+            e.area,
+            
+            f.file_number AS f_file_number,
+            f.category AS f_category,
+            f.status AS f_status,
+            f.date_created AS f_date_created,
+            f.observation AS f_observation,
+            f.employee_id AS f_employee_id
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Long employeeId = rs.getLong("id");
+        FROM employee e
+        LEFT JOIN employee_file f ON f.employee_id = e.id
+        WHERE e.id = ? AND e.deleted = FALSE
+    """;
 
-                    //Asocia a EmployeeFile
-                    EmployeeFile employeeFile = employeeFileDAO.findByEmployeeId(employeeId, conn);
-                    Date hireDateSql = rs.getDate("hire_date");
-                    LocalDate hireDate = hireDateSql != null ? hireDateSql.toLocalDate() : null;
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setLong(1, id);
 
-                    //Crea y retorna el empleado encontrado
-                    return new Employee(
-                            employeeId,
-                            rs.getBoolean("deleted"),
-                            rs.getString("first_name"),
-                            rs.getString("last_name"),
-                            rs.getString("legal_id"),
-                            rs.getString("email"),
-                            hireDate,
-                            rs.getString("area"),
-                            employeeFile
-                    );
-                }
+        try (ResultSet rs = stmt.executeQuery()) {
+
+            if (!rs.next()) {
+                return null;
             }
-        } catch (SQLException e) {
-            throw new Exception("Error al obtener empleado por ID: " + e.getMessage(), e);
-        }
 
-        return null;
+            // ==========================
+            // MAPEO DE EmployeeFile (si existe)
+            // ==========================
+
+            EmployeeFile employeeFile = null;
+
+            String fileNumber = rs.getString("f_file_number");
+            if (fileNumber != null) {  
+                // Si file_number no es NULL, entonces existe un file asociado
+
+                LocalDate dtCreated = null;
+                Date sqlDateCreated = rs.getDate("f_date_created");
+                if (sqlDateCreated != null) {
+                    dtCreated = sqlDateCreated.toLocalDate();
+                }
+
+                employeeFile = new EmployeeFile(
+                    fileNumber,
+                    rs.getString("f_category"),
+                    FileStatus.valueOf(rs.getString("f_status")),
+                    dtCreated,
+                    rs.getString("f_observation"),
+                    rs.getLong("f_employee_id")
+                );
+            }
+
+            // ==========================
+            // MAPEO DE Employee
+            // ==========================
+
+            LocalDate hireDate = null;
+            Date hireDateSql = rs.getDate("hire_date");
+            if (hireDateSql != null) {
+                hireDate = hireDateSql.toLocalDate();
+            }
+
+            return new Employee(
+                rs.getLong("e_id"),
+                rs.getBoolean("e_deleted"),
+                rs.getString("first_name"),
+                rs.getString("last_name"),
+                rs.getString("legal_id"),
+                rs.getString("email"),
+                hireDate,
+                rs.getString("area"),
+                employeeFile
+            );
+        }
     }
+}
 
     /**
      * Recupera todos los empleados activos de la base de datos. Solo lista

@@ -1,11 +1,10 @@
-package tpi_programacion_2;
+package main;
 import dao.EmployeeDAO;
 import dao.EmployeeFileDAO;
 import service.EmployeeServiceImpl;
 import service.EmployeeFileServiceImpl;
 
 import java.util.Scanner;
-
 
 /**
  * Código para interactuar con el usuario que gestiona la aplicación por la terminal.
@@ -19,11 +18,11 @@ public class AppMenu {
     public AppMenu() {
         this.scanner = new Scanner(System.in);
 
-        // DAOs
+        // Instanciamos DAOs para manejo de acceso a la DB
         EmployeeDAO employeeDAO = new EmployeeDAO();
         EmployeeFileDAO employeeFileDAO = new EmployeeFileDAO();
 
-        // Services
+        // Instanciamos Servicios utilizados
         EmployeeServiceImpl employeeService = new EmployeeServiceImpl(employeeDAO);
         EmployeeFileServiceImpl employeeFileService = new EmployeeFileServiceImpl(employeeFileDAO, employeeDAO);
 

@@ -48,12 +48,6 @@ public class EmployeeServiceImpl implements GenericService<Employee> {
 
             ValidationHelper.validateEmployeeFormat(employee);
 
-            Employee existing = employeeDAO.findByLegalId(employee.getLegalId(), conn);
-            if (existing != null) {
-                throw new IllegalArgumentException("Employee with Legal ID " + employee.getLegalId() + " already exists.");
-            }
-
-            // 3. Delegación al DAO
             employeeDAO.insert(employee, conn);
 
             tm.commit();

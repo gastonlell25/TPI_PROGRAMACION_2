@@ -1,4 +1,4 @@
-package tpi_programacion_2;
+
 public final class MenuDisplay {
 
     private MenuDisplay() {
