@@ -2,7 +2,7 @@ package service;
 
 import config.DatabaseConnection;
 import config.TransactionManager;
-import entities.Employee;
+import Models.Employee;
 import utils.ValidationHelper;
 import java.sql.Connection;
 import java.sql.SQLException;
