@@ -66,7 +66,6 @@ public class MenuHandler {
             employee.setDeleted(false);
             employee.setFirstName(firstName);
             employee.setLastName(lastName);
-            // En tu entidad el getter es getLegalId(), así que el setter correcto es setLegalId()
             employee.setLegalId(legalId);
             employee.setEmail(email);
             employee.setHireDate(hireDate);
