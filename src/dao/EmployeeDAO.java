@@ -31,7 +31,7 @@ public class EmployeeDAO implements GenericDAO<Employee> {
     public void insert(Employee employee, Connection conn) throws Exception {
         //Se construye la consulta sql para interactuar con la base de datos.
         String sql = "INSERT INTO " + TABLE_NAME
-                + " (first_name, last_name, legalId, email, hire_date, area, deleted) "
+                + " (first_name, last_name, legal_id, email, hire_date, area, deleted) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         //Se cargan los datos para ejecutar la consulta
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -218,7 +218,7 @@ public class EmployeeDAO implements GenericDAO<Employee> {
                             rs.getBoolean("deleted"),
                             rs.getString("first_name"),
                             rs.getString("last_name"),
-                            rs.getString("legalId"),
+                            rs.getString("legal_id"),
                             rs.getString("email"),
                             hireDate,
                             rs.getString("area"),
