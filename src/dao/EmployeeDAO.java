@@ -119,19 +119,20 @@ public Employee getById(Long id, Connection conn) throws SQLException {
             e.email,
             e.hire_date,
             e.area,
-            
+            f.id as f_id,
             f.file_number AS f_file_number,
             f.category AS f_category,
             f.status AS f_status,
             f.date_created AS f_date_created,
             f.observation AS f_observation,
-            f.employee_id AS f_employee_id
-
-        FROM employee e
-        LEFT JOIN employee_file f ON f.employee_id = e.id
-        WHERE e.id = ? AND e.deleted = FALSE
-    """;
-
+            f.employee_id AS f_employee_id,
+            f.deleted AS f_deleted
+            FROM employees e
+            INNER JOIN employee_files f ON f.employee_id = e.id
+            WHERE e.id = ?
+              AND e.deleted = FALSE
+        """;
+    
     try (PreparedStatement stmt = conn.prepareStatement(sql)) {
         stmt.setLong(1, id);
 
@@ -150,44 +151,36 @@ public Employee getById(Long id, Connection conn) throws SQLException {
             String fileNumber = rs.getString("f_file_number");
             if (fileNumber != null) {  
                 // Si file_number no es NULL, entonces existe un file asociado
-
-                LocalDate dtCreated = null;
-                Date sqlDateCreated = rs.getDate("f_date_created");
-                if (sqlDateCreated != null) {
-                    dtCreated = sqlDateCreated.toLocalDate();
-                }
-
+                
                 employeeFile = new EmployeeFile(
-                    fileNumber,
-                    rs.getString("f_category"),
-                    FileStatus.valueOf(rs.getString("f_status")),
-                    dtCreated,
-                    rs.getString("f_observation"),
-                    rs.getLong("f_employee_id")
-                );
+                rs.getLong("f_id"),
+                rs.getBoolean("f_deleted"),
+                fileNumber,
+                rs.getString("f_category"),
+                FileStatus.valueOf(rs.getString("f_status")),
+                rs.getDate("f_date_created").toLocalDate(),
+                rs.getString("f_observation"),
+                rs.getLong("e_id")
+            );
             }
 
             // ==========================
             // MAPEO DE Employee
             // ==========================
-
-            LocalDate hireDate = null;
-            Date hireDateSql = rs.getDate("hire_date");
-            if (hireDateSql != null) {
-                hireDate = hireDateSql.toLocalDate();
-            }
-
-            return new Employee(
+            LocalDate hireDateFormat = rs.getObject("hire_date", LocalDate.class);
+            Employee employee = new Employee(
                 rs.getLong("e_id"),
                 rs.getBoolean("e_deleted"),
                 rs.getString("first_name"),
                 rs.getString("last_name"),
                 rs.getString("legal_id"),
                 rs.getString("email"),
-                hireDate,
+                hireDateFormat,
                 rs.getString("area"),
                 employeeFile
             );
+
+            return employee;
         }
     }
 }
@@ -250,37 +243,80 @@ public Employee getById(Long id, Connection conn) throws SQLException {
      * @throws SQLException Si ocurre un error de base de datos.
      */
     public Employee findByLegalId(String legalId, Connection conn) throws Exception {
-        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE legal_id = ? AND deleted = FALSE";
+        String sql = """
+                SELECT 
+                    e.id AS e_id,
+                    e.deleted AS e_deleted,
+                    e.first_name,
+                    e.last_name,
+                    e.legal_id,
+                    e.email,
+                    e.hire_date,
+                    e.area,
+                    f.id as f_id,
+                    f.file_number AS f_file_number,
+                    f.category AS f_category,
+                    f.status AS f_status,
+                    f.date_created AS f_date_created,
+                    f.observation AS f_observation,
+                    f.employee_id AS f_employee_id,
+                    f.deleted AS f_deleted
+                    FROM employees e
+                    INNER JOIN employee_files f ON f.employee_id = e.id
+                    WHERE e.legal_id = ?
+                      AND e.deleted = FALSE
+            """;
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, legalId);
 
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Long employeeId = rs.getLong("id");
 
-                    EmployeeFile employeeFile = employeeFileDAO.findByEmployeeId(employeeId, conn);
-                    Date hireDateSql = rs.getDate("hire_date");
-                    LocalDate hireDate = hireDateSql != null ? hireDateSql.toLocalDate() : null;
-
-                    return new Employee(
-                            employeeId,
-                            rs.getBoolean("deleted"),
-                            rs.getString("first_name"),
-                            rs.getString("last_name"),
-                            rs.getString("legal_id"),
-                            rs.getString("email"),
-                            hireDate,
-                            rs.getString("area"),
-                            employeeFile
-                    );
+                if (!rs.next()) {
+                    return null;
                 }
-            }
-        } catch (SQLException e) {
-            throw new Exception("Error al buscar empleado por ID Legal: " + e.getMessage(), e);
-        }
 
-        return null;
+                // ==========================
+                // MAPEO DE EmployeeFile (si existe)
+                // ==========================
+
+                EmployeeFile employeeFile = null;
+
+                String fileNumber = rs.getString("f_file_number");
+                if (fileNumber != null) {  
+                    // Si file_number no es NULL, entonces existe un file asociado
+
+                    employeeFile = new EmployeeFile(
+                    rs.getLong("f_id"),
+                    rs.getBoolean("f_deleted"),
+                    fileNumber,
+                    rs.getString("f_category"),
+                    FileStatus.valueOf(rs.getString("f_status")),
+                    rs.getDate("f_date_created").toLocalDate(),
+                    rs.getString("f_observation"),
+                    rs.getLong("e_id")
+                );
+                }
+
+                // ==========================
+                // MAPEO DE Employee
+                // ==========================
+                LocalDate hireDateFormat = rs.getObject("hire_date", LocalDate.class);
+                Employee employee = new Employee(
+                    rs.getLong("e_id"),
+                    rs.getBoolean("e_deleted"),
+                    rs.getString("first_name"),
+                    rs.getString("last_name"),
+                    rs.getString("legal_id"),
+                    rs.getString("email"),
+                    hireDateFormat,
+                    rs.getString("area"),
+                    employeeFile
+                );
+
+                return employee;
+            }
+        }
     }
 
     /**

@@ -415,7 +415,7 @@ public class MenuHandler {
         }
     }
 
-    public void listarEmpleadoPorId() {
+    public void getEmployeeById() {
         try {
             System.out.print("Ingrese el ID del empleado: ");
             Long id = Long.parseLong(scanner.nextLine().trim());
@@ -435,18 +435,10 @@ public class MenuHandler {
             System.out.println("Fecha ingreso: " + e.getHireDate());
             System.out.println("Área: " + e.getArea());
             System.out.println("Eliminado (soft): " + e.isDeleted());
+            System.out.println("Numero de legajo: " + e.getEmployeeFile().getFileNumber());
+            System.out.println("Categoría: " + e.getEmployeeFile().getCategory());
+            System.out.println("Observaciones: " + e.getEmployeeFile().getObservation());
 
-            EmployeeFile f = e.getEmployeeFile();
-            if (f != null) {
-                System.out.println("  Legajo ID: " + f.getId());
-                System.out.println("  N° legajo: " + f.getFileNumber());
-                System.out.println("  Categoría: " + f.getCategory());
-                System.out.println("  Estado: " + f.getStatus());
-                System.out.println("  Fecha creación: " + f.getDateCreated());
-                System.out.println("  Observación: " + f.getObservation());
-            } else {
-                System.out.println("  (Sin legajo asociado)");
-            }
 
         } catch (NumberFormatException ex) {
             System.out.println("ID inválido. Debe ser numérico.");
@@ -455,7 +447,7 @@ public class MenuHandler {
         }
     }
 
-    public void listarLegajoPorId() {
+    public void getEmployeeFileById() {
         try {
             System.out.print("Ingrese el ID del legajo: ");
             Long id = Long.parseLong(scanner.nextLine().trim());

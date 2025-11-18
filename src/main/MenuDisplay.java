@@ -1,3 +1,4 @@
+package main;
 
 public final class MenuDisplay {
 

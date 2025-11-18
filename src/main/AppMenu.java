@@ -48,8 +48,8 @@ public class AppMenu {
                 case "8" -> handler.eliminarLegajoPorId();
                 case "9" -> handler.actualizarLegajoPorEmpleado();
                 case "10" -> handler.eliminarLegajoPorEmpleado();
-                case "11" -> handler.listarEmpleadoPorId(); 
-                case "12" -> handler.listarLegajoPorId(); 
+                case "11" -> handler.getEmployeeById(); 
+                case "12" -> handler.getEmployeeFileById(); 
                 case "0" -> salir = true;
                 default -> System.out.println("Opción inválida");
             }
