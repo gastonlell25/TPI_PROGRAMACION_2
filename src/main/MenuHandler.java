@@ -71,19 +71,23 @@ public class MenuHandler {
             employee.setHireDate(hireDate);
             employee.setArea(area);
 
-            // 1) Crear empleado (service maneja transacción y validaciones)
-            employeeService.insert(employee);
-            System.out.println("Empleado creado exitosamente con ID: " + employee.getId());
 
             // 2) Preguntar si quiere crear legajo
             System.out.print("¿Desea crear también un legajo para este empleado? (s/n): ");
+            EmployeeFile file = null;
             if (scanner.nextLine().trim().equalsIgnoreCase("s")) {
-                EmployeeFile file = crearLegajoInteractivo();
-                file.setEmployeeId(employee.getId());
-                employeeFileService.insert(file);
-                employee.setEmployeeFile(file); // solo en memoria
-                System.out.println("Legajo creado con ID: " + file.getId());
+                file = crearLegajoInteractivo();
+                employee.setEmployeeFile(file);
             }
+            
+            // Si tenemos Legajo intentamos crear los dos bajo la misma conexion;
+            if (file != null) {
+                employeeService.insertEmployeeWithEmployeeFile(employee, file);
+            } else {
+                // de lo contrario solo creamos el empleado
+                employeeService.insert(employee);
+            }
+            
 
         } catch (Exception e) {
             System.err.println("Error al crear empleado: " + e.getMessage());
@@ -110,14 +114,15 @@ public class MenuHandler {
                 System.out.println("Área: " + e.getArea());
                 System.out.println("Eliminado (soft): " + e.isDeleted());
 
-                EmployeeFile f = e.getEmployeeFile();
-                if (f != null) {
-                    System.out.println("  Legajo ID: " + f.getId());
-                    System.out.println("  N° legajo: " + f.getFileNumber());
-                    System.out.println("  Categoría: " + f.getCategory());
-                    System.out.println("  Estado: " + f.getStatus());
-                    System.out.println("  Fecha creación: " + f.getDateCreated());
-                    System.out.println("  Observación: " + f.getObservation());
+                EmployeeFile employeFile = e.getEmployeeFile();
+                if (employeFile != null) {
+                    
+                    System.out.println("  Legajo ID: " + employeFile.getId());
+                    System.out.println("  N° legajo: " + employeFile.getFileNumber());
+                    System.out.println("  Categoría: " + employeFile.getCategory());
+                    System.out.println("  Estado: " + employeFile.getStatus());
+                    System.out.println("  Fecha creación: " + employeFile.getDateCreated());
+                    System.out.println("  Observación: " + employeFile.getObservation());
                 } else {
                     System.out.println("  (Sin legajo asociado)");
                 }

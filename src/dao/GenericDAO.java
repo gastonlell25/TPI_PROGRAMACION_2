@@ -14,7 +14,7 @@ import java.sql.Connection;
  */
 public interface GenericDAO<T> {
 
-    void insert(T entity, Connection conn) throws Exception;
+    T insert(T entity, Connection conn) throws Exception;
 
     void update(T entity, Connection conn) throws Exception;
 

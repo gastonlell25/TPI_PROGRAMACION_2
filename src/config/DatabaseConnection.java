@@ -9,7 +9,7 @@ public final class DatabaseConnection {
     // Adoptar System.getProperty() para la configuración
     private static final String URL = System.getProperty("db.url", "jdbc:mysql://localhost:3306/tp_empleados");
     private static final String USER = System.getProperty("db.user", "root");
-    private static final String PASSWORD = System.getProperty("db.password", "gaston38768869");
+    private static final String PASSWORD = System.getProperty("db.password", "");
 
     // Carga de Drive
     static {

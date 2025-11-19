@@ -3,11 +3,13 @@ package service;
 import config.DatabaseConnection;
 import config.TransactionManager;
 import Models.Employee;
+import Models.EmployeeFile;
 import utils.ValidationHelper;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import dao.EmployeeDAO;
+import dao.EmployeeFileDAO;
 
 /**
  * Capa de servicio para la entidad Employee. Es responsable de aplicar y
@@ -17,13 +19,15 @@ import dao.EmployeeDAO;
 public class EmployeeServiceImpl implements GenericService<Employee> {
 
     private final EmployeeDAO employeeDAO;
+    private final EmployeeFileDAO employeeFileDAO;
 
     // constructor del servicio. Inicializa las instancias de los DAOs necesarios.
-    public EmployeeServiceImpl(EmployeeDAO employeeDAO) {
+    public EmployeeServiceImpl(EmployeeDAO employeeDAO, EmployeeFileDAO employeeFileDAO) {
         if (employeeDAO == null) {
             throw new IllegalArgumentException("EmployeeDAO must not be null");
         }
         this.employeeDAO = employeeDAO;
+        this.employeeFileDAO = employeeFileDAO;
     }
 
     private Connection getNonTransactionalConnection() throws Exception {
@@ -53,7 +57,27 @@ public class EmployeeServiceImpl implements GenericService<Employee> {
             tm.commit();
         }
     }
+    
+    
+    public void insertEmployeeWithEmployeeFile(Employee employee, EmployeeFile employeeFile) throws Exception {
+        try (TransactionManager tm = new TransactionManager(getNonTransactionalConnection())) {
 
+            tm.startTransaction();
+            Connection conn = tm.getConnection();
+
+            ValidationHelper.validateEmployeeFormat(employee);
+            ValidationHelper.validateEmployeeFileFormat(employeeFile, false);
+            
+            Employee e = employeeDAO.insert(employee, conn);
+            
+            employeeFile.setEmployeeId(e.getId());
+            employeeFileDAO.insert(employeeFile, conn);
+            
+            tm.commit();
+        }
+    }
+    
+    
     /**
      * Actualiza los datos de un empleado existente. Realiza validaciones de
      * formato, existencia del ID y estado de baja lógica. Gestiona una

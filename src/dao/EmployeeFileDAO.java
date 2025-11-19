@@ -30,7 +30,7 @@ public class EmployeeFileDAO implements GenericDAO<EmployeeFile> {
      * @throws SQLException Si ocurre un error de base de datos.
      */
     @Override
-    public void insert(EmployeeFile file, Connection conn) throws Exception {
+    public EmployeeFile insert(EmployeeFile file, Connection conn) throws Exception {
         //Prepara la query para ejecutar la operacion
         String sql = "INSERT INTO " + TABLE_NAME
                 + " (file_number, category, status, date_created, observation, deleted, employee_id) "
@@ -58,6 +58,7 @@ public class EmployeeFileDAO implements GenericDAO<EmployeeFile> {
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     file.setId(generatedKeys.getLong(1));
+                    return file;
                 } else {
                     throw new SQLException("Fallo en la creación de legajo");
                 }

@@ -23,7 +23,7 @@ public class AppMenu {
         EmployeeFileDAO employeeFileDAO = new EmployeeFileDAO();
 
         // Instanciamos Servicios utilizados
-        EmployeeServiceImpl employeeService = new EmployeeServiceImpl(employeeDAO);
+        EmployeeServiceImpl employeeService = new EmployeeServiceImpl(employeeDAO, employeeFileDAO);
         EmployeeFileServiceImpl employeeFileService = new EmployeeFileServiceImpl(employeeFileDAO, employeeDAO);
 
         // Handler del menú (usa ambos servicios)

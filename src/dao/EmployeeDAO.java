@@ -29,7 +29,7 @@ public class EmployeeDAO implements GenericDAO<Employee> {
      * inserción.
      */
     @Override
-    public void insert(Employee employee, Connection conn) throws Exception {
+    public Employee insert(Employee employee, Connection conn) throws Exception {
         //Se construye la consulta sql para interactuar con la base de datos.
         String sql = "INSERT INTO " + TABLE_NAME
                 + " (first_name, last_name, legal_id, email, hire_date, area, deleted) "
@@ -54,6 +54,7 @@ public class EmployeeDAO implements GenericDAO<Employee> {
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     employee.setId(generatedKeys.getLong(1));
+                    return employee;
                 } else {
                     throw new SQLException("Fallo la inserción no se obtuvo id");
                 }
@@ -197,31 +198,72 @@ public Employee getById(Long id, Connection conn) throws SQLException {
     @Override
     public List<Employee> getAll(Connection conn) throws Exception {
         List<Employee> employees = new ArrayList<>();
-        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE deleted = FALSE ORDER BY id";
-
+        String sql = """
+            SELECT 
+                e.id AS e_id,
+                e.deleted AS e_deleted,
+                e.first_name,
+                e.last_name,
+                e.legal_id,
+                e.email,
+                e.hire_date,
+                e.area,
+                f.id as f_id,
+                f.file_number AS f_file_number,
+                f.category AS f_category,
+                f.status AS f_status,
+                f.date_created AS f_date_created,
+                f.observation AS f_observation,
+                f.employee_id AS f_employee_id,
+                f.deleted AS f_deleted
+            FROM employees e
+            INNER JOIN employee_files f ON f.employee_id = e.id
+            WHERE
+              e.deleted = FALSE
+        """;
+        
         try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Long employeeId = rs.getLong("id");
 
-                // Cargar EmployeeFile asociado
-                EmployeeFile employeeFile = employeeFileDAO.findByEmployeeId(employeeId, conn);
+                // ==========================
+                // MAPEO DE EmployeeFile (si existe)
+                // ==========================
 
-                Date hireDateSql = rs.getDate("hire_date");
-                LocalDate hireDate = hireDateSql != null ? hireDateSql.toLocalDate() : null;
+                EmployeeFile employeeFile = null;
 
-                // Crear y reotorna Employee y agregar a la lista
+                String fileNumber = rs.getString("f_file_number");
+                if (fileNumber != null) {  
+                    // Si file_number no es NULL, entonces existe un file asociado
+
+                    employeeFile = new EmployeeFile(
+                        rs.getLong("f_id"),
+                        rs.getBoolean("f_deleted"),
+                        fileNumber,
+                        rs.getString("f_category"),
+                        FileStatus.valueOf(rs.getString("f_status")),
+                        rs.getDate("f_date_created").toLocalDate(),
+                        rs.getString("f_observation"),
+                        rs.getLong("e_id")
+                    );
+                }
+
+                // ==========================
+                // MAPEO DE Employee
+                // ==========================
+                LocalDate hireDateFormat = rs.getObject("hire_date", LocalDate.class);
                 Employee employee = new Employee(
-                        employeeId,
-                        rs.getBoolean("deleted"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("legal_id"),
-                        rs.getString("email"),
-                        hireDate,
-                        rs.getString("area"),
-                        employeeFile
+                    rs.getLong("e_id"),
+                    rs.getBoolean("e_deleted"),
+                    rs.getString("first_name"),
+                    rs.getString("last_name"),
+                    rs.getString("legal_id"),
+                    rs.getString("email"),
+                    hireDateFormat,
+                    rs.getString("area"),
+                    employeeFile
                 );
+
 
                 employees.add(employee);
             }
