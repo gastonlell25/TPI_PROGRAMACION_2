@@ -1,7 +1,4 @@
 
--- =========================
--- 1. Tablas
--- =========================
 DROP DATABASE IF EXISTS tp_empleados;
 CREATE DATABASE tp_empleados CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE tp_empleados;
